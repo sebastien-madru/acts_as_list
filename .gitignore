@@ -5,3 +5,4 @@ pkg/*
 .rvmrc
 *.tmproj
 .rbenv-version
+.idea
