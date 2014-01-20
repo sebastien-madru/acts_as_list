@@ -66,7 +66,7 @@ module ActiveRecord
                 self.class.send(:sanitize_sql_hash_for_conditions, attrs)
               end
             )
-          else
+          elsif configuration[:is_boolean]
             scope_methods = %(
               def scope_condition
                 self.class.send(:sanitize_sql_hash_for_conditions, { :#{configuration[:scope].to_s} => send(:#{configuration[:scope].to_s}) })
@@ -76,6 +76,16 @@ module ActiveRecord
                 changes.include?(scope_name.to_s)
               end
             )
+          else
+            scope_methods = %(
+              def scope_condition
+                "#{configuration[:scope]}"
+              end
+
+              def scope_changed?() false end
+            )
+
+
           end
 
           class_eval <<-EOV
