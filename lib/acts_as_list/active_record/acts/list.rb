@@ -40,7 +40,7 @@ module ActiveRecord
 
           configuration[:scope] = "#{configuration[:scope]}_id".intern if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
 
-          if configuration[:scope].is_a?(Symbol) || configuration[:scope].is_a?(TrueClass) || configuration[:scope].is_a?(FalseClass)
+          if configuration[:scope].is_a?(Symbol)
             scope_methods = %(
               def scope_condition
                 self.class.send(:sanitize_sql_hash_for_conditions, { :#{configuration[:scope].to_s} => send(:#{configuration[:scope].to_s}) })
@@ -69,10 +69,12 @@ module ActiveRecord
           else
             scope_methods = %(
               def scope_condition
-                "#{configuration[:scope]}"
+                self.class.send(:sanitize_sql_hash_for_conditions, { :#{configuration[:scope].to_s} => send(:#{configuration[:scope].to_s}) })
               end
 
-              def scope_changed?() false end
+              def scope_changed?
+                changes.include?(scope_name.to_s)
+              end
             )
           end
 
